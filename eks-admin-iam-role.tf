@@ -1,0 +1,104 @@
+resource "aws_iam_role" "eks-devops-admin" {
+  name = "${var.env}-${var.project}-eks-devops-admin"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
+        Principal = {
+          AWS = "*"
+        }
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalTag/Team" = "DevOps"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name       = "eks-devops-admin"
+    Managed_By = "Terraform"
+    Project    = var.project
+  }
+}
+
+resource "aws_iam_policy" "eks-cluster-access" {
+  name = "${var.env}-${var.project}-eks-devops-admin-access"
+
+  policy = <<EOT
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "eks:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*",
+            "Condition" : {
+                "StringEquals" : {
+                    "iam:PassedToService" : "eks.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+EOT
+}
+
+resource "aws_iam_role_policy_attachment" "eks-devops-admin-access" {
+  role       = aws_iam_role.eks-devops-admin.name
+  policy_arn = aws_iam_policy.eks-cluster-access.arn
+}
+
+resource "aws_iam_policy" "assume-devops-admin-role" {
+  name = "${var.env}-${var.project}-eks-assume-devops-admin-role"
+
+  policy = jsonencode({
+
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = aws_iam_role.eks-devops-admin.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_group_policy_attachment" "eks-devops-admin-access" {
+  group      = aws_iam_group.devops_group.name
+  policy_arn = aws_iam_policy.assume-devops-admin-role.arn
+}
+
+resource "kubernetes_cluster_role_binding_v1" "eks-devops-admin-role-binding" {
+  metadata {
+    name = "devops-admin-cluster-role-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind = "Group"
+    name = "devops-admin"
+  }
+}
+
+resource "aws_eks_access_entry" "devops-admin-access" {
+  cluster_name      = var.cluster_name
+  principal_arn     = aws_iam_role.eks-devops-admin.arn
+  kubernetes_groups = ["devops-admin"]
+}
