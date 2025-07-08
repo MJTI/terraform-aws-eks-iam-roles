@@ -98,7 +98,7 @@ resource "kubernetes_cluster_role_binding_v1" "eks-devops-admin-role-binding" {
 }
 
 resource "aws_eks_access_entry" "devops-admin-access" {
-  cluster_name      = var.cluster_name
+  cluster_name      = var.eks_cluster_name
   principal_arn     = aws_iam_role.eks-devops-admin.arn
   kubernetes_groups = ["devops-admin"]
 }

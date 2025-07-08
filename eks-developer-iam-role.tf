@@ -46,7 +46,7 @@ resource "aws_iam_policy" "eks-developer-cluster-access" {
       {
         Effect   = "Allow"
         Action   = "eks:DescribeCluster"
-        Resource = "arn:aws:eks:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.cluster_name}"
+        Resource = "arn:aws:eks:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.eks_cluster_name}"
       }
     ]
 
@@ -107,7 +107,7 @@ resource "kubernetes_cluster_role_binding_v1" "eks-developer-role-binding" {
 }
 
 resource "aws_eks_access_entry" "developer-access" {
-  cluster_name      = var.cluster_name
+  cluster_name      = var.eks_cluster_name
   principal_arn     = aws_iam_role.eks-developer.arn
   kubernetes_groups = ["developer"]
 }

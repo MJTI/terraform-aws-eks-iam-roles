@@ -8,6 +8,16 @@ variable "env" {
   type        = string
 }
 
+variable "project" {
+  description = "The name of the project"
+  type        = string
+}
+
+variable "eks_cluster_name" {
+  description = "Cluster Name"
+  type = string
+}
+
 variable "devops_users" {
   description = "DevOps team users"
   type        = list(string)
@@ -18,11 +28,12 @@ variable "developer_users" {
   type        = list(string)
 }
 
-variable "project" {
-  description = "The name of the project"
-  type        = string
+variable "eks_host" {
+  description = "EKS Cluster Host"
+  type = string
 }
 
-variable "cluster_name" {
-  description = "Cluster Name"
+variable "cluster_ca_certificate" {
+  description = "Cluster CA Certificate"
+  type = string
 }
