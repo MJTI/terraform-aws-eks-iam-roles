@@ -1,5 +1,9 @@
 data "aws_caller_identity" "current" {}
 
+locals {
+  developers_arn = [for user in aws_iam_user.developer : user.arn]
+}
+
 resource "aws_iam_role" "eks-developer" {
   name = "${var.env}-${var.project}-eks-developer"
 
@@ -13,7 +17,7 @@ resource "aws_iam_role" "eks-developer" {
           "sts:TagSession"
         ]
         Principal = {
-          AWS = "*"
+          AWS = local.developers_arn
         }
         Condition = {
           StringEquals = {
@@ -29,6 +33,7 @@ resource "aws_iam_role" "eks-developer" {
     Managed_By = "Terraform"
     Project    = var.project
   }
+  depends_on = [ local.developers_arn ]
 }
 
 resource "aws_iam_policy" "eks-developer-cluster-access" {

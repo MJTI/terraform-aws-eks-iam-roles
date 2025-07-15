@@ -1,3 +1,7 @@
+locals {
+  devops_arns = [for user in aws_iam_user.devops : user.arn]
+}
+
 resource "aws_iam_role" "eks-devops-admin" {
   name = "${var.env}-${var.project}-eks-devops-admin"
 
@@ -11,7 +15,7 @@ resource "aws_iam_role" "eks-devops-admin" {
           "sts:TagSession"
         ]
         Principal = {
-          AWS = "*"
+          AWS = local.devops_arns
         }
         Condition = {
           StringEquals = {
@@ -27,6 +31,8 @@ resource "aws_iam_role" "eks-devops-admin" {
     Managed_By = "Terraform"
     Project    = var.project
   }
+
+  depends_on = [ local.devops_arns ]
 }
 
 resource "aws_iam_policy" "eks-cluster-access" {
