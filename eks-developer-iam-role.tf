@@ -33,7 +33,7 @@ resource "aws_iam_role" "eks-developer" {
     Managed_By = "Terraform"
     Project    = var.project
   }
-  depends_on = [ local.developers_arn ]
+  depends_on = [local.developers_arn]
 }
 
 resource "aws_iam_policy" "eks-developer-cluster-access" {

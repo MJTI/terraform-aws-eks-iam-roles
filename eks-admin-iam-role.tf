@@ -32,7 +32,7 @@ resource "aws_iam_role" "eks-devops-admin" {
     Project    = var.project
   }
 
-  depends_on = [ local.devops_arns ]
+  depends_on = [local.devops_arns]
 }
 
 resource "aws_iam_policy" "eks-cluster-access" {

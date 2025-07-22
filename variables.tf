@@ -15,7 +15,7 @@ variable "project" {
 
 variable "eks_cluster_name" {
   description = "Cluster Name"
-  type = string
+  type        = string
 }
 
 variable "devops_users" {
@@ -30,10 +30,10 @@ variable "developer_users" {
 
 variable "eks_host" {
   description = "EKS Cluster Host"
-  type = string
+  type        = string
 }
 
 variable "cluster_ca_certificate" {
   description = "Cluster CA Certificate"
-  type = string
+  type        = string
 }
