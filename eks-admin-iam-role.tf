@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 locals {
   devops_arns = [for user in aws_iam_user.devops : user.arn]
 }
