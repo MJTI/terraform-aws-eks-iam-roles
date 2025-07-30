@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   devops_arns = [for user in aws_iam_user.devops : user.arn]
 }
@@ -107,4 +109,12 @@ resource "aws_eks_access_entry" "devops-admin-access" {
   cluster_name      = var.eks_cluster_name
   principal_arn     = aws_iam_role.eks-devops-admin.arn
   kubernetes_groups = ["devops-admin"]
+}
+
+resource "aws_eks_Access_entry" "cluster-admin-access" {
+  count = length(var.cluster-admin-access)
+
+  cluster_name      = var.eks_cluster_name
+  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${count.index}"
+  user_name         = "${count.index}"
 }
