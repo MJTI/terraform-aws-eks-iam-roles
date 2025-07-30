@@ -30,7 +30,8 @@ variable "developer_users" {
 
 variable "cluster-admin-access" {
   description = "List of AWS usernames that will have cluster-admin-access"
-  type = list(string)
+  type        = list(string)
+  default     = []
 }
 
 variable "eks_host" {

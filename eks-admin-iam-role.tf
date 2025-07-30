@@ -109,10 +109,27 @@ resource "aws_eks_access_entry" "devops-admin-access" {
   kubernetes_groups = ["devops-admin"]
 }
 
-resource "aws_eks_Access_entry" "cluster-admin-access" {
+resource "kubernetes_cluster_role_binding_v1" "eks-admin-role-binding" {
   count = length(var.cluster-admin-access)
 
-  cluster_name      = var.eks_cluster_name
-  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${count.index}"
-  user_name         = "${count.index}"
+  metadata {
+    name = "admin-cluster-role-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind = "Group"
+    name = "${var.project}-admin"
+  }
+}
+
+resource "aws_eks_access_entry" "cluster-admin-access" {
+  count = length(var.cluster-admin-access)
+
+  cluster_name  = var.eks_cluster_name
+  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.cluster-admin-access[count.index]}"
+  user_name     = "${var.project}-admin"
 }
