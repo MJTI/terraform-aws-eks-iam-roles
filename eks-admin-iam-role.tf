@@ -88,50 +88,8 @@ resource "aws_iam_group_policy_attachment" "eks-devops-admin-access" {
   policy_arn = aws_iam_policy.assume-devops-admin-role.arn
 }
 
-resource "kubernetes_cluster_role_binding_v1" "eks-devops-admin-role-binding" {
-  metadata {
-    name = "devops-admin-cluster-role-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Group"
-    name      = "devops-admin"
-  }
-}
-
 resource "aws_eks_access_entry" "devops-admin-access" {
   cluster_name      = var.eks_cluster_name
   principal_arn     = aws_iam_role.eks-devops-admin.arn
-  kubernetes_groups = ["devops-admin"]
-}
-
-resource "kubernetes_cluster_role_binding_v1" "eks-admin-role-binding" {
-  count = length(var.cluster_admin_access)
-
-  metadata {
-    name = "admin-cluster-role-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Group"
-    name      = "${var.project}-admin"
-  }
-}
-
-resource "aws_eks_access_entry" "cluster-admin-access" {
-  count = length(var.cluster_admin_access)
-
-  cluster_name  = var.eks_cluster_name
-  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.cluster_admin_access[count.index]}"
-  user_name     = "${var.project}-admin"
+  kubernetes_groups = ["${var.project}-admin"]
 }

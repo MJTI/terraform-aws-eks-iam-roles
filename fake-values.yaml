@@ -6,8 +6,6 @@ project = "mprofile"
 
 eks_cluster_name = "fake-cluster"
 
-cluster_admin_access = [ "cluster-admin" ]
-
 devops_users = [ "user1", "user2" ]
 
 developer_users = [ "user3", "user4" ]
