@@ -98,8 +98,9 @@ resource "kubernetes_cluster_role_binding_v1" "eks-devops-admin-role-binding" {
     name      = "cluster-admin"
   }
   subject {
-    kind = "Group"
-    name = "devops-admin"
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "devops-admin"
   }
 }
 
@@ -121,8 +122,9 @@ resource "kubernetes_cluster_role_binding_v1" "eks-admin-role-binding" {
     name      = "cluster-admin"
   }
   subject {
-    kind = "Group"
-    name = "${var.project}-admin"
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "${var.project}-admin"
   }
 }
 
