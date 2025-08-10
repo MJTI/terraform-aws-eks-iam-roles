@@ -100,7 +100,7 @@ resource "aws_eks_access_entry" "devops-admin-access" {
   principal_arn     = aws_iam_role.eks-devops-admin.arn
   kubernetes_groups = ["${var.project}-admin"]
 
-  depends_on = [ terraform_data.create-admin-role-binding ]
+  depends_on = [terraform_data.create-admin-role-binding]
 }
 
 resource "aws_eks_access_entry" "cluster-admin-access" {
@@ -110,5 +110,5 @@ resource "aws_eks_access_entry" "cluster-admin-access" {
   principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.cluster_admin_access[count.index]}"
   kubernetes_groups = ["${var.project}-admin"]
 
-  depends_on = [ terraform_data.create-admin-role-binding ]
+  depends_on = [terraform_data.create-admin-role-binding]
 }
