@@ -88,17 +88,24 @@ resource "aws_iam_group_policy_attachment" "eks-devops-admin-access" {
   policy_arn = aws_iam_policy.assume-devops-admin-role.arn
 }
 
-resource "terraform_data" "create-admin-role-binding" {
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ${path.module}/scripts/create-admin-role-binding.sh; ${path.module}/scripts/create-admin-role-binding.sh ${var.eks_cluster_name} ${var.region} ${var.project}"
+resource "kubernetes_cluster_role_binding_v1" "eks-devops-role-binding" {
+  metadata {
+    name = "devops-cluster-role-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "devops-admin"
   }
 }
 
 resource "aws_eks_access_entry" "devops-admin-access" {
   cluster_name      = var.eks_cluster_name
   principal_arn     = aws_iam_role.eks-devops-admin.arn
-  kubernetes_groups = ["${var.project}-admin"]
-
-  depends_on = [terraform_data.create-admin-role-binding]
+  kubernetes_groups = ["devops-admin"]
 }
